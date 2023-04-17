@@ -29,8 +29,7 @@ class Subdomain:
         """
         self._set_subdomain(request=request)
         self._set_url_conf(request=request)
-        response = self._get_response(request)
-        return response
+        return self._get_response(request)
 
     def _set_url_conf(self, request: HttpRequest):
         """
@@ -43,8 +42,7 @@ class Subdomain:
             return
         urlconfs: dict = settings.SUBDOMAIN_URL_CONF
         default_conf = urlconfs.get("*", None)
-        urlconf = urlconfs.get(request.subdomain, None)
-        if urlconf:
+        if urlconf := urlconfs.get(request.subdomain, None):
             request.urlconf = urlconf
         elif default_conf:
             request.urlconf = default_conf
@@ -61,12 +59,11 @@ class Subdomain:
         except KeyError:
             return
 
-        allowed_hosts = []
-        for allow_host in settings.ALLOWED_HOSTS:
-            if allow_host.startswith("."):
-                allowed_hosts.append(allow_host)
-                continue
-
+        allowed_hosts = [
+            allow_host
+            for allow_host in settings.ALLOWED_HOSTS
+            if allow_host.startswith(".")
+        ]
         hostname_split = hostname.split(":")
         hostname = hostname_split[0]
 
