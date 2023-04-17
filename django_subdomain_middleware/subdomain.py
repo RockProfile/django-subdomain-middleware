@@ -64,22 +64,17 @@ class Subdomain:
         allowed_hosts = []
         for allow_host in settings.ALLOWED_HOSTS:
             if allow_host.startswith("."):
-                allowed_hosts.append(allow_host[1:])
+                allowed_hosts.append(allow_host)
                 continue
-            allowed_hosts.append(allow_host)
 
-        hostname = hostname
         hostname_split = hostname.split(":")
         hostname = hostname_split[0]
 
         subdomain = hostname.split(".")[0]
         length = len(subdomain) + 1
         hostname_without_subdomain = hostname[length:]
-        if not (
-            hostname in allowed_hosts or hostname_without_subdomain not in allowed_hosts
-        ):
-            hostname = hostname_without_subdomain
+        if f".{hostname_without_subdomain}" in allowed_hosts:
             subdomain = subdomain
         else:
             subdomain = ""
-        request.subdomain = f"{subdomain}." if subdomain else ""
+        request.subdomain = f"{subdomain}" if subdomain else ""
